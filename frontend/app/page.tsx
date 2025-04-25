@@ -1,5 +1,9 @@
-import Image from "next/image";
+const Home = () => {
 
-export default function Home() {
-  return <h1>MyWallet</h1>;
-}
+  return (
+    <div className="flex h-full items-center justify-center">
+    </div>
+  );
+};
+
+export default Home;
