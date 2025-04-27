@@ -1,14 +1,14 @@
-import { Button } from "./_components/ui/button";
-import { UserButton } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+"use client"; // Marca o arquivo como Client Component
+
+import { useAuth, UserButton } from "@clerk/nextjs";
 import { useEffect } from "react";
+import { redirect } from "next/navigation";
 
 const fetchUserData = async () => {
   try {
     const response = await fetch("http://localhost:3000/protected", {
       method: "GET",
-      credentials: "include", // Inclui cookies para sessão
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -16,23 +16,23 @@ const fetchUserData = async () => {
     }
 
     const data = await response.json();
-    console.log(data); // Exibe os dados do usuário autenticado
+    console.log(data);
   } catch (error) {
     console.error(error);
   }
 };
 
-// Componente Home
-const Home = async () => {
-  const { userId } = await auth();
-
-  if (!userId) {
-    redirect("/login");
-  }
+const Home = () => {
+  const { userId } = useAuth();
 
   useEffect(() => {
-    fetchUserData();
-  }, []);
+    if (!userId) {
+      redirect("/login");
+    } else {
+      fetchUserData();
+    }
+  }, [userId]);
+
 
   return (
     <div className="flex h-full items-center justify-center">

@@ -12,7 +12,7 @@ export default function Carousel() {
   const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>({
     loop: true,
     renderMode: "performance",
-    mode: "free", // permite controle manual + autoplay
+    mode: "free",
     slides: {
       origin: "center",
       perView: 1,
@@ -20,7 +20,6 @@ export default function Carousel() {
     },
   })
 
-  // Autoplay
   useEffect(() => {
     setIsMounted(true)
     const interval = setInterval(() => {
@@ -59,6 +58,7 @@ export default function Carousel() {
               width={400}
               height={300}
               className="max-h-[60%] w-auto rounded-3xl shadow-lg transition-all duration-700 ease-in-out"
+              priority
             />
           </div>
         ))}

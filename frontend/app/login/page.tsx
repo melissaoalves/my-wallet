@@ -44,6 +44,7 @@ const LoginPage = async () => {
           layout="fill"
           objectFit="cover"
           className="absolute inset-0"
+          priority
         />
         <div className="absolute inset-0 flex items-center justify-center">
           <Carousel />

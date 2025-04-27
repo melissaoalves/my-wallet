@@ -1,41 +1,65 @@
-import 'dotenv/config';
-import express from 'express';
-import { clerkClient, requireAuth, getAuth, clerkMiddleware } from '@clerk/express'; // Importar Clerk SDK
+import "dotenv/config";
+import express, { Request, Response, NextFunction } from "express";
+import {
+  clerkClient,
+  requireAuth,
+  getAuth,
+  clerkMiddleware,
+} from "@clerk/express";
 
 const app = express();
 const PORT = 3000;
 
-// Middleware do Clerk para verificar autenticação
-app.use(clerkMiddleware());  // Este middleware verifica a autenticação do usuário
+app.use(clerkMiddleware());
 
-// Rota pública para testar
-app.get('/', (req, res) => {
-  res.send('Servidor Express com Clerk');
+app.get("/", (req: Request, res: Response) => {
+  res.send("Servidor Express com Clerk");
 });
 
-// Rota protegida que exige autenticação
-app.get('/protected', requireAuth(), (req, res, next) => {
-  (async () => {
-    const { userId } = getAuth(req);  // Obtém o userId da requisição autenticada
+app.get(
+  "/protected",
+  requireAuth(),
+  (req: Request, res: Response, next: NextFunction) => {
+    (async () => {
+      try {
+        const { userId } = getAuth(req);
 
-    // Verificar se userId não é null
-    if (!userId) {
-      return res.status(401).json({ message: 'User not authenticated' });
-    }
+        console.log("Authenticated user ID:", userId);
 
-    try {
-      // Usar Clerk SDK para buscar os dados completos do usuário
-      const user = await clerkClient.users.getUser(userId);
+        if (!userId) {
+          return res.status(401).json({ message: "User not authenticated" });
+        }
+        const user = await clerkClient.users.getUser(userId);
+        console.log("User data:", user);
 
-      // Retornar os dados do usuário
-      res.json({ user });
-    } catch (error) {
-      next(error); // Passar erros para o middleware de erro
-    }
-  })();
+        res.json({ user });
+      } catch (error) {
+        console.error("Error while fetching user data:", error);
+        next(error);
+      }
+    })().catch(next);
+  }
+);
+
+app.post("/logout", (req: Request, res: Response) => {
+  try {
+    res.clearCookie("session");
+    res.status(200).json({ message: "User logged out successfully" });
+  } catch (error) {
+    console.error("Logout error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    res.status(500).json({ message: "Error logging out", error: errorMessage });
+  }
 });
 
-// Iniciar o servidor e escutar na porta 3000
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error(err);
+  res
+    .status(500)
+    .json({ message: "Internal Server Error", error: err.message });
+});
+
 app.listen(PORT, () => {
-  console.log(`Example app listening at http://localhost:${PORT}`);
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
