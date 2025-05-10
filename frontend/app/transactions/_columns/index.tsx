@@ -5,7 +5,6 @@ import TransactionTypeBadge from "../_components/type-badge";
 import { Button } from "../../_components/ui/button";
 import { PencilIcon, TrashIcon } from "lucide-react";
 
-// Constantes de categoria e método de pagamento
 export const TRANSACTION_CATEGORY_LABELS = {
   EDUCATION: "Educação",
   ENTERTAINMENT: "Entretenimento",
@@ -28,18 +27,17 @@ export const TRANSACTION_PAYMENT_METHOD_LABELS = {
   PIX: "Pix",
 };
 
-// Definindo a interface da transação
 export interface Transaction {
   id: string;
   name: string;
   type: 'DEPOSIT' | 'EXPENSE' | 'INVESTMENT';
-  category: keyof typeof TRANSACTION_CATEGORY_LABELS;  // Utiliza as chaves da categoria
-  paymentMethod: keyof typeof TRANSACTION_PAYMENT_METHOD_LABELS; // Utiliza as chaves do método de pagamento
+  category: keyof typeof TRANSACTION_CATEGORY_LABELS;
+  paymentMethod: keyof typeof TRANSACTION_PAYMENT_METHOD_LABELS;
   date: string;
   amount: string;
 }
 
-// Definindo as colunas para a tabela de transações
+
 export const transactionColumns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "name",
@@ -56,13 +54,13 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
     accessorKey: "category",
     header: "Categoria",
     cell: ({ row: { original: transaction } }) =>
-      TRANSACTION_CATEGORY_LABELS[transaction.category], // Acessando a label pela chave
+      TRANSACTION_CATEGORY_LABELS[transaction.category], 
   },
   {
     accessorKey: "paymentMethod",
     header: "Método de Pagamento",
     cell: ({ row: { original: transaction } }) =>
-      TRANSACTION_PAYMENT_METHOD_LABELS[transaction.paymentMethod], // Acessando a label pela chave
+      TRANSACTION_PAYMENT_METHOD_LABELS[transaction.paymentMethod],
   },
   {
     accessorKey: "date",

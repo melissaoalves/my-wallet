@@ -11,9 +11,16 @@ export const getTransactionsController = async (req: Request, res: Response) => 
   }
 };
 
-export const createTransactionController = async (req: Request, res: Response) => {
+export const createTransactionController = async (req: Request, res: Response): Promise<void> => { 
+  const { userId } = req.body;
+
+  if (!userId) {
+    res.status(400).json({ message: 'Usuário não autenticado' });
+    return;
+  }
+
   try {
-    const transaction = await createTransactionService(req.body);
+    const transaction = await createTransactionService(req.body); 
     res.status(201).json(transaction);
   } catch (error) {
     console.error('Erro ao criar transação:', error);

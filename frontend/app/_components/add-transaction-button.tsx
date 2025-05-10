@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowDownUpIcon } from "lucide-react";
-import { Button } from "./ui/button"; // Certifique-se de que o caminho está correto
+import { Button } from "./ui/button";
 import {
   Dialog,
   DialogClose,
@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "./ui/dialog"; // Certifique-se de que o caminho está correto
+} from "./ui/dialog";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -22,19 +22,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form"; // Certifique-se de que o caminho está correto
-import { Input } from "./ui/input"; // Certifique-se de que o caminho está correto
-import { MoneyInput } from "./money-input"; // Certifique-se de que o caminho está correto
+} from "./ui/form";
+import { Input } from "./ui/input";
+import { MoneyInput } from "./money-input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select"; // Certifique-se de que o caminho está correto
-import { DatePicker } from "./ui/date-picker"; // Certifique-se de que o caminho está correto
+} from "./ui/select";
+import { DatePicker } from "./ui/date-picker";
+import { useAuth } from "@clerk/nextjs";
 
-// Opções de tipos, categorias e métodos de pagamento (do frontend)
 const TRANSACTION_TYPE_OPTIONS = [
   { value: "EXPENSE", label: "Despesa" },
   { value: "DEPOSIT", label: "Depósito" },
@@ -63,41 +63,47 @@ const TRANSACTION_PAYMENT_METHOD_OPTIONS = [
   { value: "PIX", label: "Pix" },
 ];
 
-// Esquema de validação com zod
 const formSchema = z.object({
   name: z.string().trim().min(1, { message: "O nome é obrigatório." }),
   amount: z.string().trim().min(1, { message: "O valor é obrigatório." }),
   type: z.enum(["EXPENSE", "DEPOSIT", "INVESTMENT"], {
     required_error: "O tipo é obrigatório.",
   }),
-  category: z.enum([
-    "EDUCATION",
-    "ENTERTAINMENT",
-    "FOOD",
-    "HEALTH",
-    "HOUSING",
-    "OTHER",
-    "SALARY",
-    "TRANSPORTATION",
-    "UTILITY",
-  ], {
-    required_error: "A categoria é obrigatória.",
-  }),
-  paymentMethod: z.enum([
-    "BANK_TRANSFER",
-    "BANK_SLIP",
-    "CASH",
-    "CREDIT_CARD",
-    "DEBIT_CARD",
-    "OTHER",
-    "PIX",
-  ], { required_error: "O método de pagamento é obrigatório." }),
+  category: z.enum(
+    [
+      "EDUCATION",
+      "ENTERTAINMENT",
+      "FOOD",
+      "HEALTH",
+      "HOUSING",
+      "OTHER",
+      "SALARY",
+      "TRANSPORTATION",
+      "UTILITY",
+    ],
+    {
+      required_error: "A categoria é obrigatória.",
+    }
+  ),
+  paymentMethod: z.enum(
+    [
+      "BANK_TRANSFER",
+      "BANK_SLIP",
+      "CASH",
+      "CREDIT_CARD",
+      "DEBIT_CARD",
+      "OTHER",
+      "PIX",
+    ],
+    { required_error: "O método de pagamento é obrigatório." }
+  ),
   date: z.date({ required_error: "A data é obrigatória." }),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
 
 const AddTransactionButton = () => {
+  const { userId } = useAuth();
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -112,9 +118,6 @@ const AddTransactionButton = () => {
 
   const onSubmit: SubmitHandler<FormSchema> = async (data) => {
     try {
-      // Recupera o userId do localStorage (ou de outro lugar, como um contexto global)
-      const userId = localStorage.getItem("userId"); // ou de outro lugar, como um contexto global
-
       if (!userId) {
         throw new Error("Usuário não autenticado");
       }
@@ -122,7 +125,7 @@ const AddTransactionButton = () => {
       const response = await fetch("http://localhost:3000/api/transactions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, userId }), // Envia o userId junto com os dados da transação
+        body: JSON.stringify({ ...data, userId }),
       });
 
       if (!response.ok) {
@@ -208,7 +211,6 @@ const AddTransactionButton = () => {
                 <FormMessage />
               </FormItem>
             )} />
-            {/* O DatePicker agora está sendo usado corretamente */}
             <FormField control={form.control} name="date" render={({ field }) => (
               <FormItem>
                 <FormLabel>Data</FormLabel>

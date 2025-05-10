@@ -5,14 +5,12 @@ export const getTransactionsService = async () => {
 };
 
 export const createTransactionService = async (transactionData: any) => {
-  console.log('Received transaction data:', transactionData); // Log para verificar os dados recebidos
+  console.log('Received transaction data:', transactionData);
 
-  // Verificar se o userId está presente
   if (!transactionData.userId) {
     throw new Error("userId is required");
   }
 
-  // Formatar o valor de 'amount' removendo 'R$' e convertendo para número
   const amount = parseFloat(transactionData.amount.replace('R$', '').replace(/\./g, '').replace(',', '.'));
 
   if (isNaN(amount)) {
@@ -20,16 +18,15 @@ export const createTransactionService = async (transactionData: any) => {
   }
 
   try {
-    // Criando a transação no banco
     const transaction = await prisma.transaction.create({
       data: {
         name: transactionData.name,
-        amount: amount, // Use o valor formatado
+        amount: amount,
         type: transactionData.type,
         category: transactionData.category,
         paymentMethod: transactionData.paymentMethod,
-        date: new Date(transactionData.date), // Certifique-se de que a data está no formato correto
-        userId: transactionData.userId, // Inclua o userId aqui
+        date: new Date(transactionData.date),
+        userId: transactionData.userId,
       },
     });
 

@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 
 const fetchUserData = async () => {
   try {
-    const response = await fetch("http://localhost:3000/protected", {
+    const response = await fetch("http://localhost:3000/auth/protected", {
       method: "GET",
       credentials: "include",
     });
