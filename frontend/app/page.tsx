@@ -1,4 +1,4 @@
-"use client"; // Marca o arquivo como Client Component
+"use client";
 
 import { useAuth, UserButton } from "@clerk/nextjs";
 import { useEffect } from "react";
