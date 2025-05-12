@@ -102,7 +102,7 @@ const formSchema = z.object({
 
 type FormSchema = z.infer<typeof formSchema>;
 
-const AddTransactionButton = () => {
+const AddTransactionButton = ({ reloadTransactions }: { reloadTransactions: () => void }) => {
   const { userId } = useAuth();
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -122,11 +122,17 @@ const AddTransactionButton = () => {
         throw new Error("Usuário não autenticado");
       }
 
+      const amountNumber = parseFloat(data.amount.replace('R$', '').trim().replace(',', '.'));
+
+      console.log("Dados enviados para o backend:", { ...data, userId, amount: amountNumber });
+
       const response = await fetch("http://localhost:3000/api/transactions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, userId }),
+        body: JSON.stringify({ ...data, userId, amount: amountNumber }), // Enviar 'amount' como número
       });
+
+      console.log("Resposta do servidor:", response);
 
       if (!response.ok) {
         throw new Error("Erro ao criar transação");
@@ -134,6 +140,8 @@ const AddTransactionButton = () => {
 
       const transaction = await response.json();
       console.log("Transação criada:", transaction);
+
+      reloadTransactions();
 
       form.reset();
     } catch (error) {

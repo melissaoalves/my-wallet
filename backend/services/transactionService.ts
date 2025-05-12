@@ -8,6 +8,8 @@ export const getTransactionsService = async (userId: string) => {
 
 export const createTransactionService = async (transactionData: any) => {
   try {
+    console.log('Dados para criação de transação no banco de dados:', transactionData);
+
     const transaction = await prisma.transaction.create({
       data: {
         userId: transactionData.userId,
@@ -26,6 +28,7 @@ export const createTransactionService = async (transactionData: any) => {
     throw new Error('Erro ao criar transação no banco');
   }
 };
+
 
 export const updateTransactionService = async (id: string, transactionData: any) => {
   try {
