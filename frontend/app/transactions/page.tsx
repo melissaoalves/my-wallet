@@ -16,26 +16,28 @@ const TransactionsPage = () => {
       try {
         if (!userId) {
           redirect("/login");
+          return;
         }
-        
-        const response = await fetch('http://localhost:3000/api/transactions', {
+
+        const response = await fetch(`http://localhost:3000/api/transactions`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${userId}`,
-          }
+          },
+          credentials: "include",
         });
-        
-        if (!response.ok) throw new Error('Falha ao buscar transações');
-        
+
+        if (!response.ok) throw new Error("Erro ao buscar transações");
+
         const data = await response.json();
         setTransactions(data);
       } catch (error) {
-        console.error('Erro ao buscar transações:', error);
+        console.error("Erro ao buscar transações:", error);
       }
     };
 
-    if (userId) fetchTransactions();
+    fetchTransactions();
   }, [userId]);
 
   return (

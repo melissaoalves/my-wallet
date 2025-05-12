@@ -199,18 +199,6 @@ const AddTransactionButton = () => {
                 <FormMessage />
               </FormItem>
             )} />
-            <FormField control={form.control} name="paymentMethod" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Método de pagamento</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl><SelectTrigger><SelectValue placeholder="Selecione um método de pagamento..." /></SelectTrigger></FormControl>
-                  <SelectContent>{TRANSACTION_PAYMENT_METHOD_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                  ))}</SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )} />
             <FormField control={form.control} name="date" render={({ field }) => (
               <FormItem>
                 <FormLabel>Data</FormLabel>
@@ -218,7 +206,6 @@ const AddTransactionButton = () => {
                 <FormMessage />
               </FormItem>
             )} />
-
             <DialogFooter>
               <DialogClose asChild>
                 <Button type="button" variant="outline">Cancelar</Button>
