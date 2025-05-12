@@ -8,7 +8,7 @@ import { useAuth } from "@clerk/nextjs";
 import { redirect } from 'next/navigation';
 
 const TransactionsPage = () => {
-  const { userId } = useAuth();
+  const { userId } = useAuth(); // Recupera o userId do Clerk
   const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
@@ -18,15 +18,15 @@ const TransactionsPage = () => {
           redirect("/login");
           return;
         }
-
         const response = await fetch(`http://localhost:3000/api/transactions`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${userId}`,
+            'Authorization': `Bearer ${userId}`
           },
-          credentials: "include",
+          credentials: 'include',
         });
+
 
         if (!response.ok) throw new Error("Erro ao buscar transações");
 
