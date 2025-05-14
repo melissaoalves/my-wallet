@@ -37,7 +37,8 @@ export interface Transaction {
   amount: string;
 }
 
-export const transactionColumns: ColumnDef<Transaction>[] = [
+// Agora é função que recebe reloadTransactions para repassar aos botões
+export const transactionColumns = (reloadTransactions: () => void): ColumnDef<Transaction>[] => [
   {
     accessorKey: "name",
     header: "Nome",
@@ -85,8 +86,8 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
     header: "Ações",
     cell: ({ row: { original: transaction } }) => (
       <div className="space-x-1">
-        <EditTransactionButton transaction={transaction} />
-        <DeleteTransactionButton transactionId={transaction.id} />
+        <EditTransactionButton transaction={transaction} reloadTransactions={reloadTransactions} />
+        <DeleteTransactionButton transactionId={transaction.id} reloadTransactions={reloadTransactions} />
       </div>
     ),
   },

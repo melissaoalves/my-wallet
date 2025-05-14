@@ -102,11 +102,12 @@ const formSchema = z.object({
 
 type FormSchema = z.infer<typeof formSchema>;
 
-const EditTransactionButton = ({
-  transaction,
-}: {
+interface EditTransactionButtonProps {
   transaction: any;
-}) => {
+  reloadTransactions: () => void;
+}
+
+const EditTransactionButton = ({ transaction, reloadTransactions }: EditTransactionButtonProps) => {
   const { userId } = useAuth();
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -146,6 +147,7 @@ const EditTransactionButton = ({
       console.log("Transação atualizada:", updatedTransaction);
 
       form.reset();
+      reloadTransactions(); // Atualiza a lista após editar
     } catch (error) {
       console.error("Erro ao salvar transação:", error);
     }
@@ -159,7 +161,7 @@ const EditTransactionButton = ({
     >
       <DialogTrigger asChild>
         <Button className="rounded-full font-bold bg-opacity-0 hover:bg-opacity-10">
-          <PencilIcon />
+          <PencilIcon className="mr-2" />
         </Button>
       </DialogTrigger>
       <DialogContent>
