@@ -12,6 +12,7 @@ const TransactionsPage = () => {
   const { userId } = useAuth();
   const [transactions, setTransactions] = useState([]);
 
+  // Função para buscar as transações
   const reloadTransactions = async () => {
     try {
       if (!userId) {
@@ -42,15 +43,17 @@ const TransactionsPage = () => {
 
   return (
     <>
-    < Navbar/>
-      <div className="space-y-6 p-6">
-        <div className="flex w-full items-center justify-between">
-          <h1 className="text-2xl font-bold">Transações</h1>
-          <AddTransactionButton reloadTransactions={reloadTransactions} />
-        </div>
-        <DataTable columns={transactionColumns} data={transactions} />
+    <Navbar />
+    <div className="space-y-6 p-6">
+      <div className="flex w-full items-center justify-between">
+        <h1 className="text-2xl font-bold">Transações</h1>
+        <AddTransactionButton reloadTransactions={reloadTransactions} />
       </div>
+      {/* Passa reloadTransactions para as colunas */}
+      <DataTable columns={transactionColumns(reloadTransactions)} data={transactions} />
+    </div>
     </>
+    
   );
 };
 
