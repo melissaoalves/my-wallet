@@ -1,8 +1,9 @@
 "use client";
 
-import { useAuth, UserButton } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import { useEffect } from "react";
 import { redirect } from "next/navigation";
+import Navbar from "@app/_components/navbar";
 
 const Home = () => {
   const { userId } = useAuth();
@@ -14,9 +15,11 @@ const Home = () => {
   }, [userId]);
 
   return (
-    <div className="flex h-full items-center justify-center">
-      <UserButton showName />
+    <>
+    <Navbar />
+    <div className="flex h-[calc(100vh-64px)] items-center justify-center">
     </div>
+    </>
   );
 };
 
