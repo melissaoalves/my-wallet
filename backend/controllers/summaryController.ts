@@ -1,26 +1,30 @@
-// controllers/summaryController.ts
 import { Request, Response } from 'express';
 import prisma from '../config/db';
 
-// Função para calcular os resumos mensais
 export const getSummaryController = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { month } = req.query;
-    const startDate = new Date(`2024-${month}-01`);
-    const endDate = new Date(`2024-${month}-31`);
+    const { month, userId } = req.query;
+
+    if (!userId || typeof userId !== 'string') {
+      res.status(400).json({ message: 'Usuário não autenticado' });
+      return;
+    }
+
+    const startDate = new Date(`2025-${month}-01`);
+    const endDate = new Date(`2025-${month}-31`);
 
     const depositsTotal = await prisma.transaction.aggregate({
-      where: { type: "DEPOSIT", date: { gte: startDate, lte: endDate } },
+      where: { userId, type: "DEPOSIT", date: { gte: startDate, lte: endDate } },
       _sum: { amount: true },
     });
 
     const investmentsTotal = await prisma.transaction.aggregate({
-      where: { type: "INVESTMENT", date: { gte: startDate, lte: endDate } },
+      where: { userId, type: "INVESTMENT", date: { gte: startDate, lte: endDate } },
       _sum: { amount: true },
     });
 
     const expensesTotal = await prisma.transaction.aggregate({
-      where: { type: "EXPENSE", date: { gte: startDate, lte: endDate } },
+      where: { userId, type: "EXPENSE", date: { gte: startDate, lte: endDate } },
       _sum: { amount: true },
     });
 

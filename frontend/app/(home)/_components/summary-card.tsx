@@ -8,6 +8,7 @@ interface SummaryCardProps {
   title: string;
   amount: number;
   size?: "small" | "large";
+  reloadTransactions?: () => void;
 }
 
 const SummaryCard = ({
@@ -15,32 +16,24 @@ const SummaryCard = ({
   title,
   amount,
   size = "small",
+  reloadTransactions,
 }: SummaryCardProps) => {
   return (
     <Card>
       <CardHeader className="flex-row items-center gap-4">
         {icon}
-        <p
-          className={`${
-            size === "small" ? "text-muted-foreground" : "text-white opacity-70"
-          }`}
-        >
+        <p className={`${size === "small" ? "text-muted-foreground" : "text-white opacity-70"}`}>
           {title}
         </p>
       </CardHeader>
       <CardContent className="flex justify-between">
-        <p
-          className={`font-bold ${
-            size === "small" ? "text-2xl" : "text-4xl"
-          }`}
-        >
+        <p className={`font-bold ${size === "small" ? "text-2xl" : "text-4xl"}`}>
           {Intl.NumberFormat("pt-BR", {
             style: "currency",
             currency: "BRL",
           }).format(amount)}
         </p>
-
-        {size === "large" && <AddTransactionButton />}
+        {size === "large" && <AddTransactionButton reloadTransactions={reloadTransactions ?? (() => {})} />}
       </CardContent>
     </Card>
   );

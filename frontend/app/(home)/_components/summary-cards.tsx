@@ -1,18 +1,36 @@
-// app/(home)/_components/summary-cards.tsx
-import { Card, CardContent, CardHeader } from "../../_components/ui/card";
-import { PiggyBankIcon, TrendingDownIcon, TrendingUpIcon, WalletIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import SummaryCard from "./summary-card";
+import { PiggyBankIcon, TrendingDownIcon, TrendingUpIcon, WalletIcon } from "lucide-react";
 
 interface SummaryCardsProps {
-  summary: {
-    balance: number;
-    depositsTotal: number;
-    investmentsTotal: number;
-    expensesTotal: number;
-  };
+  month: string;
+  userId: string;
+  reloadTransactions?: () => void;
 }
 
-const SummaryCards = ({ summary }: SummaryCardsProps) => {
+const SummaryCards = ({ month, userId, reloadTransactions }: SummaryCardsProps) => {
+  const [summary, setSummary] = useState({
+    balance: 0,
+    depositsTotal: 0,
+    investmentsTotal: 0,
+    expensesTotal: 0,
+  });
+
+  const fetchSummary = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/summary?month=${month}&userId=${userId}`);
+      if (!response.ok) throw new Error("Erro ao buscar resumo");
+      const data = await response.json();
+      setSummary(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSummary();
+  }, [month, userId]);
+
   return (
     <div className="space-y-6">
       <SummaryCard
@@ -20,6 +38,7 @@ const SummaryCards = ({ summary }: SummaryCardsProps) => {
         title="Saldo"
         amount={summary.balance}
         size="large"
+        reloadTransactions={reloadTransactions}
       />
       <div className="grid grid-cols-3 gap-6">
         <SummaryCard

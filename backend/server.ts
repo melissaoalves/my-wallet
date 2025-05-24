@@ -4,6 +4,7 @@ import "dotenv/config";
 
 import loginRouter from './src/login';
 import transactionsRouter from './routes/transactions';
+import summaryRoutes from './routes/summaryRoutes';
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(express.json());
 
 app.use('/auth', loginRouter);
 app.use('/api', transactionsRouter);
+app.use('/api', summaryRoutes);
 
 app.get("/", (req, res) => {
   res.send("Servidor Express rodando com Clerk!");
