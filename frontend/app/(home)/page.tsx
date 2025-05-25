@@ -9,7 +9,13 @@ import TimeSelect from "./_components/time-select";
 
 const Home = () => {
   const { userId } = useAuth();
-  const [month, setMonth] = useState("01");
+  
+  const getCurrentMonth = () => {
+    const now = new Date();
+    return (now.getMonth() + 1).toString().padStart(2, '0');
+  };
+
+  const [month, setMonth] = useState(getCurrentMonth());
 
   useEffect(() => {
     if (!userId) {
