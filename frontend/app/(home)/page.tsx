@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { redirect } from "next/navigation";
 import Navbar from "@app/_components/navbar";
 import SummaryCards from "./_components/summary-cards";
@@ -10,18 +10,18 @@ import LastTransactions from "./_components/last-transactions";
 
 const Home = () => {
   const { userId } = useAuth();
-  
-  const getCurrentMonth = () => {
-    const now = new Date();
-    return (now.getMonth() + 1).toString().padStart(2, '0');
-  };
+  const [month, setMonth] = useState(() => {
+    const currentMonth = new Date().getMonth() + 1;
+    return String(currentMonth).padStart(2, "0");
+  });
+  const [reloadSignal, setReloadSignal] = useState(false);
 
-  const [month, setMonth] = useState(getCurrentMonth());
+  const triggerReload = useCallback(() => {
+    setReloadSignal((prev) => !prev);
+  }, []);
 
   useEffect(() => {
-    if (!userId) {
-      redirect("/login");
-    }
+    if (!userId) redirect("/login");
   }, [userId]);
 
   return (
@@ -32,9 +32,12 @@ const Home = () => {
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <TimeSelect setMonth={setMonth} />
         </div>
-        {userId && <SummaryCards month={month} userId={userId} />}
-        <LastTransactions userId={userId!} month={month} />
-
+        {userId && (
+          <>
+            <SummaryCards month={month} userId={userId} reloadTransactions={triggerReload} />
+            <LastTransactions userId={userId} month={month} reloadSignal={reloadSignal} />
+          </>
+        )}
       </div>
     </>
   );

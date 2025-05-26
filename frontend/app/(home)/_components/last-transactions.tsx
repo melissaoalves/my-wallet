@@ -18,9 +18,10 @@ interface Transaction {
 interface LastTransactionsProps {
   userId: string;
   month: string;
+  reloadSignal: boolean; // Novo sinal para indicar quando recarregar
 }
 
-const LastTransactions = ({ userId, month }: LastTransactionsProps) => {
+const LastTransactions = ({ userId, month, reloadSignal }: LastTransactionsProps) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ const LastTransactions = ({ userId, month }: LastTransactionsProps) => {
       }
     };
     fetchLastTransactions();
-  }, [userId, month]);
+  }, [userId, month, reloadSignal]);
 
   const getAmountColor = (type: string) => {
     if (type === "EXPENSE") return "text-red-500";

@@ -34,6 +34,7 @@ import {
 } from "./ui/select";
 import { DatePicker } from "./ui/date-picker";
 import { useAuth } from "@clerk/nextjs";
+import { useState } from "react";
 
 const TRANSACTION_TYPE_OPTIONS = [
   { value: "EXPENSE", label: "Despesa" },
@@ -104,6 +105,8 @@ type FormSchema = z.infer<typeof formSchema>;
 
 const AddTransactionButton = ({ reloadTransactions }: { reloadTransactions: () => void }) => {
   const { userId } = useAuth();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -124,37 +127,31 @@ const AddTransactionButton = ({ reloadTransactions }: { reloadTransactions: () =
 
       const amountNumber = parseFloat(data.amount.replace('R$', '').trim().replace(',', '.'));
 
-      console.log("Dados enviados para o backend:", { ...data, userId, amount: amountNumber });
-
       const response = await fetch("http://localhost:3000/api/transactions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, userId, amount: amountNumber }), // Enviar 'amount' como número
+        body: JSON.stringify({ ...data, userId, amount: amountNumber }),
       });
-
-      console.log("Resposta do servidor:", response);
 
       if (!response.ok) {
         throw new Error("Erro ao criar transação");
       }
 
-      const transaction = await response.json();
-      console.log("Transação criada:", transaction);
+      await response.json();
 
       reloadTransactions();
-
       form.reset();
+      setIsDialogOpen(false);
     } catch (error) {
       console.error("Erro ao criar transação:", error);
     }
   };
 
   return (
-    <Dialog
-      onOpenChange={(open) => {
-        if (!open) form.reset();
-      }}
-    >
+    <Dialog open={isDialogOpen} onOpenChange={(open) => {
+      setIsDialogOpen(open);
+      if (!open) form.reset();
+    }}>
       <DialogTrigger asChild>
         <Button className="rounded-full font-bold">
           Adicionar transação
