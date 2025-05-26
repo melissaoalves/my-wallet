@@ -18,7 +18,7 @@ interface Transaction {
 interface LastTransactionsProps {
   userId: string;
   month: string;
-  reloadSignal: boolean; // Novo sinal para indicar quando recarregar
+  reloadSignal: boolean;
 }
 
 const LastTransactions = ({ userId, month, reloadSignal }: LastTransactionsProps) => {
