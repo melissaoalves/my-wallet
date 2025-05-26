@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import Navbar from "@app/_components/navbar";
 import SummaryCards from "./_components/summary-cards";
 import TimeSelect from "./_components/time-select";
+import LastTransactions from "./_components/last-transactions";
 
 const Home = () => {
   const { userId } = useAuth();
@@ -32,6 +33,8 @@ const Home = () => {
           <TimeSelect setMonth={setMonth} />
         </div>
         {userId && <SummaryCards month={month} userId={userId} />}
+        <LastTransactions userId={userId!} month={month} />
+
       </div>
     </>
   );

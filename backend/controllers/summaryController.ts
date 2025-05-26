@@ -45,3 +45,26 @@ export const getSummaryController = async (req: Request, res: Response): Promise
     res.status(500).json({ message: "Erro ao calcular resumos" });
   }
 };
+
+export const getLastTransactionsController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { userId, month } = req.query;
+    const startDate = new Date(`2025-${month}-01`);
+    const endDate = new Date(`2025-${month}-31`);
+
+    const lastTransactions = await prisma.transaction.findMany({
+      where: {
+        userId: String(userId),
+        date: { gte: startDate, lte: endDate },
+      },
+      orderBy: { date: 'desc' },
+      take: 10,
+    });
+
+    res.json(lastTransactions);
+  } catch (error) {
+    console.error("Erro ao buscar últimas transações:", error);
+    res.status(500).json({ message: "Erro ao buscar últimas transações" });
+  }
+};
+
