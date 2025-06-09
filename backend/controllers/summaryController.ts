@@ -68,3 +68,47 @@ export const getLastTransactionsController = async (req: Request, res: Response)
   }
 };
 
+export const getCategorySummaryController = async (req: Request, res: Response) => {
+  try {
+    const { userId, month } = req.query;
+    const startDate = new Date(`2025-${month}-01`);
+    const endDate = new Date(`2025-${month}-31`);
+
+    // total geral de despesas do mês
+    const totalExpense = await prisma.transaction.aggregate({
+      where: {
+        userId: String(userId),
+        type: 'EXPENSE',
+        date: { gte: startDate, lte: endDate },
+      },
+      _sum: { amount: true },
+    });
+
+    const rawSummary = await prisma.transaction.groupBy({
+      by: ['category'],
+      where: {
+        userId: String(userId),
+        type: 'EXPENSE',
+        date: { gte: startDate, lte: endDate },
+      },
+      _sum: { amount: true },
+    });
+
+    const total = totalExpense._sum.amount ?? 0;
+
+    const formatted = rawSummary.map((item) => ({
+      category: item.category,
+      totalAmount: item._sum.amount ?? 0,
+      percentageOfTotal:
+        Number(total) > 0
+          ? Math.round((Number(item._sum.amount ?? 0) / Number(total)) * 100)
+          : 0,
+
+    }));
+
+    res.json(formatted);
+  } catch (error) {
+    console.error("Erro ao buscar gastos por categoria:", error);
+    res.status(500).json({ message: 'Erro ao buscar gastos por categoria' });
+  }
+};
