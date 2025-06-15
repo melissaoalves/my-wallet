@@ -1,14 +1,25 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import SummaryCard from "./summary-card";
-import { PiggyBankIcon, TrendingDownIcon, TrendingUpIcon, WalletIcon } from "lucide-react";
+import {
+  PiggyBankIcon,
+  TrendingDownIcon,
+  TrendingUpIcon,
+  WalletIcon,
+} from "lucide-react";
 
 interface SummaryCardsProps {
   month: string;
   userId: string;
+  reloadSignal: boolean; // controla recarregamento
   reloadTransactions?: () => void;
 }
 
-const SummaryCards = ({ month, userId, reloadTransactions }: SummaryCardsProps) => {
+const SummaryCards = ({
+  month,
+  userId,
+  reloadSignal,
+  reloadTransactions,
+}: SummaryCardsProps) => {
   const [summary, setSummary] = useState({
     balance: 0,
     depositsTotal: 0,
@@ -16,20 +27,22 @@ const SummaryCards = ({ month, userId, reloadTransactions }: SummaryCardsProps) 
     expensesTotal: 0,
   });
 
-  const fetchSummary = async () => {
+  const fetchSummary = useCallback(async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/summary?month=${month}&userId=${userId}`);
+      const response = await fetch(
+        `http://localhost:3000/api/summary?month=${month}&userId=${userId}`
+      );
       if (!response.ok) throw new Error("Erro ao buscar resumo");
       const data = await response.json();
       setSummary(data);
     } catch (error) {
       console.error(error);
     }
-  };
+  }, [month, userId]);
 
   useEffect(() => {
     fetchSummary();
-  }, [month, userId]);
+  }, [fetchSummary, reloadSignal]);
 
   return (
     <div className="space-y-6">

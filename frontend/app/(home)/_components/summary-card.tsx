@@ -19,7 +19,7 @@ const SummaryCard = ({
   reloadTransactions,
 }: SummaryCardProps) => {
   return (
-    <Card>
+    <Card className="rounded-lg">
       <CardHeader className="flex-row items-center gap-4">
         {icon}
         <p className={`${size === "small" ? "text-muted-foreground" : "text-white opacity-70"}`}>
