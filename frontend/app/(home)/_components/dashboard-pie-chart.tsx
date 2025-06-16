@@ -18,24 +18,31 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface DashboardPieChartProps {
   data: {
-    depositsTotal: number;
-    expensesTotal: number;
-    investmentsTotal: number;
+    depositsTotal: number | string;
+    expensesTotal: number | string;
+    investmentsTotal: number | string;
   };
 }
 
 const DashboardPieChart = ({ data }: DashboardPieChartProps) => {
-  const { depositsTotal, expensesTotal, investmentsTotal } = data;
-  const total = depositsTotal + expensesTotal + investmentsTotal;
+  // 1) Converte tudo para número
+  const deposits = Number(data.depositsTotal) || 0;
+  const expenses = Number(data.expensesTotal) || 0;
+  const investments = Number(data.investmentsTotal) || 0;
 
+  // 2) Calcula total real
+  const total = deposits + expenses + investments;
+
+  // 3) Função de porcentagem
   const getPercentage = (value: number) =>
     total > 0 ? ((value / total) * 100).toFixed(1) : "0.0";
 
+  // 4) Dados para o gráfico
   const chartData = {
     labels: ["Ganhos", "Gastos", "Investimentos"],
     datasets: [
       {
-        data: [depositsTotal, expensesTotal, investmentsTotal],
+        data: [deposits, expenses, investments],
         backgroundColor: ["#22c55e", "#ef4444", "#ffffff"],
         borderWidth: 8,
         borderColor: "#0c0c0c",
@@ -50,10 +57,9 @@ const DashboardPieChart = ({ data }: DashboardPieChartProps) => {
       tooltip: {
         callbacks: {
           label: function (tooltipItem: TooltipItem<"pie">) {
-            const index = tooltipItem.dataIndex;
-            const label = chartData.labels[index];
-            const value = chartData.datasets[0].data[index] as number;
-
+            const idx = tooltipItem.dataIndex;
+            const label = chartData.labels[idx];
+            const value = chartData.datasets[0].data[idx] as number;
             return `${label}: R$ ${value.toLocaleString("pt-BR", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
@@ -79,7 +85,7 @@ const DashboardPieChart = ({ data }: DashboardPieChartProps) => {
             Ganhos
           </div>
           <span className="font-bold text-white">
-            {getPercentage(depositsTotal)}%
+            {getPercentage(deposits)}%
           </span>
         </div>
 
@@ -91,7 +97,7 @@ const DashboardPieChart = ({ data }: DashboardPieChartProps) => {
             Gastos
           </div>
           <span className="font-bold text-white">
-            {getPercentage(expensesTotal)}%
+            {getPercentage(expenses)}%
           </span>
         </div>
 
@@ -103,7 +109,7 @@ const DashboardPieChart = ({ data }: DashboardPieChartProps) => {
             Investimentos
           </div>
           <span className="font-bold text-white">
-            {getPercentage(investmentsTotal)}%
+            {getPercentage(investments)}%
           </span>
         </div>
       </div>

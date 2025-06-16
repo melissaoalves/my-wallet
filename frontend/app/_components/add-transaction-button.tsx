@@ -220,7 +220,7 @@ const AddTransactionButton = ({ reloadTransactions }: { reloadTransactions: () =
               <FormItem>
                 <FormLabel>Categoria</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl><SelectTrigger><SelectValue placeholder="Selecione a categoria..." /></SelectTrigger></FormControl>
+                  <FormControl><SelectTrigger><SelectValue placeholder="Selecione a categoria" /></SelectTrigger></FormControl>
                   <SelectContent>{TRANSACTION_CATEGORY_OPTIONS.map((option) => (
                     <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
                   ))}</SelectContent>
