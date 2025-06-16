@@ -11,33 +11,52 @@ export const getSummaryController = async (req: Request, res: Response): Promise
     }
 
     const startDate = new Date(`2025-${month}-01`);
-    const endDate = new Date(`2025-${month}-31`);
+    const endDate   = new Date(`2025-${month}-31`);
+
+    const priorDeposits = await prisma.transaction.aggregate({
+      where: { userId, type: "DEPOSIT",    date: { lt: startDate } },
+      _sum:  { amount: true },
+    });
+    const priorInvests  = await prisma.transaction.aggregate({
+      where: { userId, type: "INVESTMENT", date: { lt: startDate } },
+      _sum:  { amount: true },
+    });
+    const priorExpenses = await prisma.transaction.aggregate({
+      where: { userId, type: "EXPENSE",    date: { lt: startDate } },
+      _sum:  { amount: true },
+    });
+
+    const openingDeposits    = Number(priorDeposits._sum.amount ?? 0);
+    const openingInvestments = Number(priorInvests._sum.amount ?? 0);
+    const openingExpenses    = Number(priorExpenses._sum.amount ?? 0);
+    const openingBalance     = openingDeposits - openingInvestments - openingExpenses;
 
     const depositsTotal = await prisma.transaction.aggregate({
-      where: { userId, type: "DEPOSIT", date: { gte: startDate, lte: endDate } },
-      _sum: { amount: true },
+      where: { userId, type: "DEPOSIT",    date: { gte: startDate, lte: endDate } },
+      _sum:  { amount: true },
     });
-
     const investmentsTotal = await prisma.transaction.aggregate({
       where: { userId, type: "INVESTMENT", date: { gte: startDate, lte: endDate } },
-      _sum: { amount: true },
+      _sum:  { amount: true },
     });
-
     const expensesTotal = await prisma.transaction.aggregate({
-      where: { userId, type: "EXPENSE", date: { gte: startDate, lte: endDate } },
-      _sum: { amount: true },
+      where: { userId, type: "EXPENSE",    date: { gte: startDate, lte: endDate } },
+      _sum:  { amount: true },
     });
 
-    const depositsAmount = depositsTotal._sum.amount ?? 0;
-    const investmentsAmount = investmentsTotal._sum.amount ?? 0;
-    const expensesAmount = expensesTotal._sum.amount ?? 0;
+    const depositsAmount     = Number(depositsTotal._sum.amount ?? 0);
+    const investmentsAmount  = Number(investmentsTotal._sum.amount ?? 0);
+    const expensesAmount     = Number(expensesTotal._sum.amount ?? 0);
 
-    const balance = Number(depositsAmount) - Number(investmentsAmount) - Number(expensesAmount);
+    const monthNet = depositsAmount - investmentsAmount - expensesAmount;
+
+    const balance = openingBalance + monthNet;
 
     res.json({
       depositsTotal: depositsAmount,
       investmentsTotal: investmentsAmount,
       expensesTotal: expensesAmount,
+      openingBalance,
       balance,
     });
   } catch (error) {
@@ -50,12 +69,12 @@ export const getLastTransactionsController = async (req: Request, res: Response)
   try {
     const { userId, month } = req.query;
     const startDate = new Date(`2025-${month}-01`);
-    const endDate = new Date(`2025-${month}-31`);
+    const endDate   = new Date(`2025-${month}-31`);
 
     const lastTransactions = await prisma.transaction.findMany({
       where: {
         userId: String(userId),
-        date: { gte: startDate, lte: endDate },
+        date:   { gte: startDate, lte: endDate },
       },
       orderBy: { date: 'desc' },
       take: 10,
@@ -72,14 +91,13 @@ export const getCategorySummaryController = async (req: Request, res: Response) 
   try {
     const { userId, month } = req.query;
     const startDate = new Date(`2025-${month}-01`);
-    const endDate = new Date(`2025-${month}-31`);
+    const endDate   = new Date(`2025-${month}-31`);
 
-    // total geral de despesas do mês
     const totalExpense = await prisma.transaction.aggregate({
       where: {
         userId: String(userId),
-        type: 'EXPENSE',
-        date: { gte: startDate, lte: endDate },
+        type:   'EXPENSE',
+        date:   { gte: startDate, lte: endDate },
       },
       _sum: { amount: true },
     });
@@ -88,8 +106,8 @@ export const getCategorySummaryController = async (req: Request, res: Response) 
       by: ['category'],
       where: {
         userId: String(userId),
-        type: 'EXPENSE',
-        date: { gte: startDate, lte: endDate },
+        type:   'EXPENSE',
+        date:   { gte: startDate, lte: endDate },
       },
       _sum: { amount: true },
     });
@@ -103,7 +121,6 @@ export const getCategorySummaryController = async (req: Request, res: Response) 
         Number(total) > 0
           ? Math.round((Number(item._sum.amount ?? 0) / Number(total)) * 100)
           : 0,
-
     }));
 
     res.json(formatted);
